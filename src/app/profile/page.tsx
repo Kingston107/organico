@@ -40,8 +40,15 @@ export default function ProfilePage() {
       .eq('id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        if (!data) return;
-        setFullName((data.full_name as string) ?? '');
+        const metaName =
+          typeof user.user_metadata?.full_name === 'string'
+            ? user.user_metadata.full_name
+            : '';
+        if (!data) {
+          if (metaName) setFullName(metaName);
+          return;
+        }
+        setFullName((data.full_name as string) || metaName);
         setPhone((data.phone as string) ?? '');
         setAddressLine((data.address_line as string) ?? '');
         setCity((data.city as string) ?? '');

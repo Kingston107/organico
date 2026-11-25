@@ -7,19 +7,16 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleCredentialSubmit(
+  async function handleSignIn(
     event: FormEvent<HTMLFormElement>
   ): Promise<void> {
     event.preventDefault();
     setError(null);
-    setMessage(null);
 
     const supabase = getSupabaseBrowserClient();
     if (!supabase) {
@@ -31,33 +28,16 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      if (mode === 'signin') {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        if (signInError) {
-          setError(signInError.message);
-          return;
-        }
-        router.push('/profile');
-        router.refresh();
-      } else {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback?next=/profile`,
-          },
-        });
-        if (signUpError) {
-          setError(signUpError.message);
-          return;
-        }
-        setMessage(
-          'Account created! Check your email inbox to confirm your address.'
-        );
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
+      if (signInError) {
+        setError(signInError.message);
+        return;
       }
+      router.push('/profile');
+      router.refresh();
     } finally {
       setLoading(false);
     }
@@ -95,9 +75,7 @@ export default function LoginPage() {
         }}
       >
         <h1 className="text-xl font-bold" style={{ color: 'var(--text-main)' }}>
-          {mode === 'signin'
-            ? 'Welcome to Organico'
-            : 'Create your Organico account'}
+          Welcome to Organico
         </h1>
 
         {error && (
@@ -105,13 +83,8 @@ export default function LoginPage() {
             {error}
           </div>
         )}
-        {message && (
-          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
-            {message}
-          </div>
-        )}
 
-        <form onSubmit={handleCredentialSubmit} className="space-y-3">
+        <form onSubmit={handleSignIn} className="space-y-3">
           <input
             required
             type="email"
@@ -192,46 +165,28 @@ export default function LoginPage() {
             className="min-h-11 w-full rounded-lg px-4 text-sm font-semibold text-white transition-opacity hover:opacity-95 disabled:opacity-60"
             style={{ backgroundColor: 'var(--accent)' }}
           >
-            {loading
-              ? 'Please wait...'
-              : mode === 'signin'
-                ? 'Sign In'
-                : 'Create Account'}
+            {loading ? 'Please wait...' : 'Sign In'}
           </button>
         </form>
 
         <div
-          className="border-t pt-3 text-center text-xs"
-          style={{
-            borderColor: 'var(--border-subtle)',
-            color: 'var(--text-muted)',
-          }}
+          className="space-y-2 border-t pt-3 text-center"
+          style={{ borderColor: 'var(--border-subtle)' }}
         >
-          {mode === 'signin' ? (
-            <button
-              type="button"
-              onClick={() => {
-                setMode('signup');
-                setError(null);
-                setMessage(null);
-              }}
-              className="font-medium hover:underline"
-            >
-              New to Organico? Create an account
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setMode('signin');
-                setError(null);
-                setMessage(null);
-              }}
-              className="font-medium hover:underline"
-            >
-              Already have an account? Sign in
-            </button>
-          )}
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            New to Organico?
+          </p>
+          <Link
+            href="/signup"
+            className="flex min-h-10 w-full items-center justify-center rounded-lg border px-4 text-xs font-semibold transition-colors"
+            style={{
+              borderColor: 'var(--accent)',
+              color: 'var(--accent)',
+              backgroundColor: 'var(--accent-soft)',
+            }}
+          >
+            Create an Account (Sign Up)
+          </Link>
         </div>
       </div>
     </section>
