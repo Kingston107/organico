@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       'Plastic-free, recyclable, and organic everyday goods delivered across India.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#F2F9F4',
-    theme_color: '#237A4B',
+    background_color: '#FFFFFF',
+    theme_color: '#059669',
     icons: [
       {
         src: '/icons/icon-192.svg',
